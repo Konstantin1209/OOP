@@ -3,8 +3,8 @@ import requests
 from datetime import datetime
 import json
 import os
-TOKEN = ''
-TOKEN_yan = ''
+TOKEN = str(input('Введите токен ВК: '))
+TOKEN_yan = str(input('Введите токен Яндекс диска: '))
 class VKAPICllient:
     API_BASE_URL = 'https://api.vk.com/method'
 
@@ -28,7 +28,7 @@ class VKAPICllient:
         response = requests.get(self._build_url('photos.get'), params={**params, **photos_params})
         return response.json()
        
-    def download_disc(self):
+    def download_dis(self):
         """скачать в текущую папку на диске и создание json файла"""
         profile_photos = self.get_profile_photos()
         for photos in profile_photos['response']['items']:
@@ -57,7 +57,7 @@ class VKAPICllient:
                         json.dump([json_data], json_file, indent=4)
 
 
-class Yandex_disk:
+class YandexDisk:
     API_BASE_YANDEX = 'https://cloud-api.yandex.net'
 
     def __init__(self, token, new_folder):
@@ -95,8 +95,12 @@ class Yandex_disk:
 
 
 if __name__ ==  '__main__':
-    yan_disk = Yandex_disk(TOKEN_yan, 'ВК')
-    vk_client = VKAPICllient(TOKEN, ???, 'z')
-    photos_info = yan_disk.download_yandex()
+    user_id = input('введите id пользователя: ')
+    size = str(input('введите желаемый размер фото: s, m, x, y, z, 0: '))
+    n_folder = input('Введите название папки для яндекс диска: ')
+    yan_disk = YandexDisk(TOKEN_yan, n_folder)
+    vk_client = VKAPICllient(TOKEN, user_id, size)
     folder = yan_disk.create_dir()
-    pprint(photos_info)
+    pprint(vk_client.download_dis())
+    pprint(yan_disk.download_yandex())
+
