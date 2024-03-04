@@ -9,9 +9,8 @@ class VKAPICllient:
     API_BASE_URL = 'https://api.vk.com/method'
 
 
-    def __init__(self, token, user_id):
+    def __init__(self, token):
         self.token = token
-        self.user_id = user_id
       
     def _build_url(self, api_method):
         return f"{self.API_BASE_URL}/{api_method}"
@@ -22,15 +21,15 @@ class VKAPICllient:
             'v': '5.131'
                 }
     
-    def get_profile_photos(self):
+    def get_profile_photos(self, user_id):
         params = self.get_common_params()
-        photos_params = ({'owner_id': self.user_id, 'album_id': 'profile', 'extended': 1, 'photo_sizes': 1})
+        photos_params = ({'owner_id': user_id, 'album_id': 'profile', 'extended': 1, 'photo_sizes': 1})
         response = requests.get(self._build_url('photos.get'), params={**params, **photos_params})
         return response.json()
        
-    def download_dis(self, size):
+    def download_dis(self, size, user_id):
         """скачать в текущую папку на диске и создание json файла"""
-        profile_photos = self.get_profile_photos()
+        profile_photos = self.get_profile_photos(user_id)
         for photos in profile_photos['response']['items']:
             maximum_size = size
             filtered_list = list(filter(lambda d: maximum_size in d.values(), photos['sizes']))
@@ -97,12 +96,13 @@ class YandexDisk:
 if __name__ ==  '__main__':
     TOKEN = str(input('Введите токен ВК: '))
     TOKEN_yan = str(input('Введите токен Яндекс диска: '))
-    user_id = input('введите id пользователя: ')
+    us_id = input('введите id пользователя: ')
     size = str(input('введите желаемый размер фото: s, m, x, y, z, 0: '))
     n_folder = input('Введите название папки для яндекс диска: ')
     yan_disk = YandexDisk(TOKEN_yan)
-    vk_client = VKAPICllient(TOKEN, user_id)
+    vk_client = VKAPICllient(TOKEN)
     folder = yan_disk.create_dir(n_folder)
-    pprint(vk_client.download_dis(size))
+    vk_client.get_profile_photos(us_id)
+    pprint(vk_client.download_dis(size, us_id))
     pprint(yan_disk.download_yandex(n_folder))
 
